@@ -2,6 +2,6 @@ jellyfin_delete:on-schedule:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   script:
-    - python delete_watched.py
+    - python jellyfin/delete_watched.py
   tags:
     - python  
