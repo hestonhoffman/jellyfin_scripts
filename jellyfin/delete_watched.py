@@ -1,9 +1,5 @@
 #!/usr/bin/python3
 
-'''
-Weird behavior: The API call to retieve the access token can result in new access tokens being created.
-'''
-
 import requests, os, json, pathlib, logging
 from dotenv import load_dotenv
 from pprint import pprint
@@ -140,7 +136,6 @@ session.params.update({'UserId': jelly_user_id})
 
 # Retrieve a list of watched episodes
 item_data = get_items_to_delete()
-pprint(item_data)
 # Retrieve a list of watched movies
 # movies_info = get_movies_to_delete()
 
@@ -173,7 +168,6 @@ for entry in media_to_delete:
     if delete:
         deleted_count += 1
         print(f"dry_run: Deleting {entry}")
-        '''
         deletion = session.delete(jelly_url + '/Items/' + entry['Id'])
         if deletion.ok:
             logging.info(f'Deleted {entry["SeriesName"]}: Episode {entry["EpNumber"]}')
@@ -182,7 +176,6 @@ for entry in media_to_delete:
             print(f'\x1b[31mWARN\x1b[0m:Deletion failed with {deletion.text}')
             logging.warning(f'Failed to delete {entry["SeriesName"]}: Episode {entry["EpNumber"]}')
             logging.warning(deletion.text)
-        '''    
     else:
         print(f'\t\x1b[32mTime threshold not met for {name_string}. Passing\x1b[0m')        
 
