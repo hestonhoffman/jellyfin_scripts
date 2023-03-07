@@ -169,14 +169,14 @@ for entry in media_to_delete:
         deleted_count += 1
         deletion = session.delete(jelly_url + '/Items/' + entry['Id'])
         if deletion.ok:
-            logging.info(f'Deleted {entry["SeriesName"]}: Episode {entry["EpNumber"]}')
+            logging.info(f'Deleted {entry["SeriesName"]}. Season: {entry["SeasonName"]} Episode {entry["EpNumber"]}')
             print(f'Deleted {name_string}')
         else:
             print(f'\x1b[31mWARN\x1b[0m:Deletion failed with {deletion.text}')
             logging.warning(f'Failed to delete {entry["SeriesName"]}: Episode {entry["EpNumber"]}')
             logging.warning(deletion.text)
     else:
-        print(f'\t\x1b[32mTime threshold not met for {name_string}. Passing\x1b[0m')        
+        print(f'\t\x1b[32mTime threshold not met for {name_string}. Passing\x1b[0m')
 
 if deleted_count > 0:
     logging.info('Deletion completed')
