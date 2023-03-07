@@ -167,7 +167,6 @@ for entry in media_to_delete:
     print(f'Checking entry \x1b[3m{name_string}\x1b[0m')
     if delete:
         deleted_count += 1
-        print(f"dry_run: Deleting {entry}")
         deletion = session.delete(jelly_url + '/Items/' + entry['Id'])
         if deletion.ok:
             logging.info(f'Deleted {entry["SeriesName"]}: Episode {entry["EpNumber"]}')
