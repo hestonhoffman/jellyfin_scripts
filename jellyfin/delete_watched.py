@@ -107,7 +107,8 @@ required_envs = [
     'JELLY_URL',
     'JELLY_API_TOKEN',
     'JELLY_ADMIN_USER',
-    'JELLY_ADMIN_PASSWORD'
+    'JELLY_ADMIN_PASSWORD',
+    'DISCORD_WEBHOOK'
 ]
 
 load_dotenv()
@@ -115,6 +116,7 @@ check_envs(required_envs)
 jelly_user = os.getenv('JELLY_USER')
 jelly_url = os.getenv('JELLY_URL')
 jelly_api_token = os.getenv('JELLY_API_TOKEN')
+discord_hook = os.getenv('DISCORD_WEBHOOK')
 
 session = requests.Session()
 session.headers.update({'Content-Type': 'application/json'})
@@ -156,29 +158,40 @@ for entry in item_data['Items']:
         entry_dict['Name'] = entry['Name']
     media_to_delete.append(entry_dict)
 
-deleted_count = 0
+deleted_list = []
 
 for entry in media_to_delete:
     delete = delete_bool(entry['LastPlayedDate'])
     try:
-        name_string = f'TV: {entry["SeriesName"]}, Episode {entry["EpNumber"]}'
+        name_string = f'TV: {entry["SeriesName"]}, Season: {entry["SeasonName"]}, Episode {entry["EpNumber"]}'
     except:
         name_string = f'Movie: {entry["Name"]}'
     print(f'Checking entry \x1b[3m{name_string}\x1b[0m')
     if delete:
-        deleted_count += 1
         deletion = session.delete(jelly_url + '/Items/' + entry['Id'])
         if deletion.ok:
-            logging.info(f'Deleted {entry["SeriesName"]}. Season: {entry["SeasonName"]} Episode {entry["EpNumber"]}')
+            logging.info(f'Deleted {name_string}')
+            deleted_list.append(f'- {name_string}\n') 
             print(f'Deleted {name_string}')
         else:
             print(f'\x1b[31mWARN\x1b[0m:Deletion failed with {deletion.text}')
-            logging.warning(f'Failed to delete {entry["SeriesName"]}: Episode {entry["EpNumber"]}')
+            logging.warning(f'Failed to delete {name_string}')
             logging.warning(deletion.text)
     else:
         print(f'\t\x1b[32mTime threshold not met for {name_string}. Passing\x1b[0m')
 
-if deleted_count > 0:
+
+discord_session = requests.Session()
+discord_session.headers.update({'Accept': 'application/json'})
+discord_session.headers.update({'Content-Type': 'application/json'})
+
+if len(deleted_list) > 0:
     logging.info('Deletion completed')
+    deleted_list = ''.join(deleted_list)
+    message_content = json.dumps({'content':f'Deleted the following:\n{deleted_list}'})
+    discord_message = discord_session.post(data=message_content, url=discord_hook)
 else:
-    logging.info('Script completed. Nothing to delete')
+    message_content = json.dumps({'content': 'Script completed. Nothing to delete'})
+    discord_maessage = discord_session.post(data=message_content, url=discord_hook)
+    logging.info(message_content)
+    
