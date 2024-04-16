@@ -1,2 +1,4 @@
 .env
 deletion_log.log
+.DS_Store
+.python-version

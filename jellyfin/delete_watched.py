@@ -146,17 +146,23 @@ media_to_delete = []
 # Create a simpler delection dictionary
 for entry in item_data['Items']:
     entry_dict = {}
-    entry_dict['Id'] = entry['Id']
-    entry_dict['LastPlayedDate'] = entry['UserData']['LastPlayedDate']
-    entry_dict['Played'] = entry['UserData']['Played']
-    if entry['Type'] == 'Episode':
-        entry_dict['EpName'] = entry['Name']
-        entry_dict['EpNumber'] = entry['IndexNumber'] 
-        entry_dict['SeasonName'] = entry['SeasonName']
-        entry_dict['SeriesName'] = entry['SeriesName']
-    else:
-        entry_dict['Name'] = entry['Name']
-    media_to_delete.append(entry_dict)
+    if entry.get('UserData'):
+        if entry.get('UserData').get('LastPlayedDate'):
+            entry_dict['Id'] = entry['Id']
+            entry_dict['LastPlayedDate'] = entry.get('UserData').get('LastPlayedDate')
+            print(entry_dict['LastPlayedDate'])
+            entry_dict['Played'] = entry['UserData']['Played']
+            if entry['Type'] == 'Episode':
+                entry_dict['EpName'] = entry['Name']
+                entry_dict['EpNumber'] = entry['IndexNumber']
+                entry_dict['SeasonName'] = entry['SeasonName']
+                entry_dict['SeriesName'] = entry['SeriesName']
+            else:
+                entry_dict['Name'] = entry['Name']
+        else:
+            print(f'Skipping unplayed entry: {entry["Name"]}')
+    if entry_dict:
+        media_to_delete.append(entry_dict)
 
 deleted_list = []
 
